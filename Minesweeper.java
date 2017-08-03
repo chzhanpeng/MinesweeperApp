@@ -4,6 +4,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,22 +17,19 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 
-
-
 public class Minesweeper extends Application {
-
 
     // The window of the application
     private Stage window;
     // Scenes of the application
-    private Scene menuScene, gameScene, settingScene;
+    private Scene homeScene, gameScene, settingScene;
     // Size of window
     private int windowSizeX, windowSizeY;
     // Size of the mine
     private int tileSize;
     private int width, height;
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Application starts runnning here
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -44,12 +42,12 @@ public class Minesweeper extends Application {
         height = 20;
 
         primaryStage.setTitle("MineSweeper");
-        // Initilize menu scene and set as default scene
-        this.menuScene = new Scene(createMenuScene());
-        primaryStage.setScene(menuScene);
+        // Initilize home scene and set as default scene
+        this.homeScene = new Scene(createHomeScene());
+        primaryStage.setScene(homeScene);
         primaryStage.show();
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Tile class for tiles in the game
     private class Tile extends StackPane {
 
@@ -63,10 +61,10 @@ public class Minesweeper extends Application {
         }
 
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // This method creates the intro menu scene
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // This method creates the intro home scene
     // MenuScene contains start, setting, and close buttons
-    private Parent createMenuScene() {
+    private Parent createHomeScene() {
         Pane root = new Pane();
         root.setPrefSize(windowSizeX, windowSizeY);
 
@@ -94,11 +92,19 @@ public class Minesweeper extends Application {
 
         return root;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the game scene where the game is played
     private Parent createGameScene() {
         Pane root = new Pane();
         root.setPrefSize(windowSizeX, windowSizeY);
+
+        VBox vBox = new VBox();
+
+        Pane menuPane = new Pane();
+        menuPane.getChildren().add(createGameSceneMenu());
+
+        Pane gamePane = new Pane();
+        ScrollPane scrollPane = new ScrollPane();
 
         // Draw all tiles in the mine
         for(int i = 0; i < this.width; i++) {
@@ -106,13 +112,43 @@ public class Minesweeper extends Application {
                 Tile tile = new Tile();
                 tile.setTranslateX(i * this.tileSize);
                 tile.setTranslateY(j * this.tileSize);
-                root.getChildren().add(tile);
+                gamePane.getChildren().add(tile);
             }
         }
+        scrollPane.setContent(gamePane);
 
+
+        vBox.getChildren().addAll(menuPane, scrollPane);
+        root.getChildren().add(vBox);
         return root;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private HBox createGameSceneMenu() {
+        HBox menu = new HBox();
+
+        Button homeButton = new Button("Home");
+        Button newButton = new Button("New Game");
+        Button settingButton = new Button("Setting");
+        Button closeButton = new Button("Close");
+
+        homeButton.setOnAction(e -> {
+            window.setScene(homeScene);
+        });
+        newButton.setOnAction(e -> {
+            // start a new game  <---------------fix later
+        });
+        settingButton.setOnAction(e ->{
+            window.setScene(settingScene);
+        });
+        closeButton.setOnAction(e -> {
+            window.close();
+        });
+        menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton);
+        return menu;
+    }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create setting scene that allows player to change game setting
     // This scene includes some dropdown menus that allow player to select
     // size of mine and game difficulty;
@@ -130,8 +166,8 @@ public class Minesweeper extends Application {
         ChoiceBox<Integer> widthChoiceBox = new ChoiceBox<Integer>();
         ChoiceBox<Integer> heightChoiceBox = new ChoiceBox<Integer>();
         for(int i = 5; i <= 100; i+=5) {            // Add all options
-          widthChoiceBox.getItems().add(i);
-          heightChoiceBox.getItems().add(i);
+            widthChoiceBox.getItems().add(i);
+            heightChoiceBox.getItems().add(i);
         }
         widthChoiceBox.setValue(this.width);
         heightChoiceBox.setValue(this.height);
@@ -141,12 +177,12 @@ public class Minesweeper extends Application {
         saveButton.setOnAction(e -> {
             this.width = widthChoiceBox.getValue();
             this.height = heightChoiceBox.getValue();
-            this.window.setScene(this.menuScene);
+            this.window.setScene(this.homeScene);
             System.out.println(this.width);
             System.out.println(this.height);
         });
         cancelButton.setOnAction( e -> {
-            this.window.setScene(this.menuScene);
+            this.window.setScene(this.homeScene);
             System.out.println(this.width);
             System.out.println(this.height);
         });
@@ -159,6 +195,6 @@ public class Minesweeper extends Application {
         root.getChildren().add(optionBox);
         return root;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 }
