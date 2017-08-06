@@ -1,198 +1,419 @@
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.geometry.Pos;
+import java.lang.StringBuilder;
 
-public class Minesweeper extends Application {
+public class MineSweeper {
 
-    // The window of the application
-    private Stage window;
-    // Scenes of the application
-    private Scene homeScene, gameScene, settingScene;
-    // Size of window
-    private int windowSizeX, windowSizeY;
-    // Size of the mine
-    private int tileSize;
-    private int fieldSizeX, fieldSizeY;
-    // pane for mine field
-    private GridPane mineField;
+    // Game board consists a matrix of tile object as mines,
+    protected Tile[][] board;
+    // Difficulty of the game
+    protected String difficulty;
+    // Total number of mine of a game
+    protected int numMines;
+    // Total visible tiles
+    protected int numVisible;
+    // Total tiles with flag
+    protected int numFlags;
+    // Whether the game is over
+    protected boolean gameOver;
+    // Keep track of first move, this helps in generating mines
+    protected int fmRow, fmCol;
+    // Whether it's brand new game/ no move taken
+    protected boolean fresh;
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // Application starts runnning here
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
-        // Initialize default values;
-        windowSizeX = 400;
-        windowSizeY = 400;
-        tileSize = 20;
-        fieldSizeX = 20;
-        fieldSizeY = 20;
-
-        primaryStage.setTitle("MineSweeper");
-        // Initilize home scene and set as default scene
-        this.homeScene = new Scene(createHomeScene());
-        primaryStage.setScene(homeScene);
-        primaryStage.show();
-    }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // Tile class for tiles in the game
-    private class Tile extends Parent {
-
-        public Tile() {
-            Rectangle tile = new Rectangle(20, 20);
-            this.getChildren().add(tile);
+    // Constructor, initialize fields and generate mines
+    public MineSweeper(int width, int height, String difficulty)
+    {
+        this.board = new Tile[width][height];
+        this.numVisible = 0;
+        this.numMines = 0;
+        this.numFlags = 0;
+        this.fresh = true;
+        this.difficulty = difficulty;
+        // Set number of mines based on game diffculty
+        if(difficulty.equals("easy"))
+        {
+            this.numMines = width*height/6;
         }
+        else if(difficulty.equals("medium"))
+        {
+            this.numMines = width*height/5;
+        }
+        else
+        {
+            this.numMines = width*height/4;
+        }
+        this.initBoard();
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // This method creates the home scene
-    // MenuScene contains start, setting, and close buttons
-    private Parent createHomeScene() {
-        Pane root = new Pane();
-        root.setPrefSize(windowSizeX, windowSizeY);
-        VBox vbox = new VBox();
-        root.getChildren().add(vbox);
-
-        // Create buttons
-        Button startButton = new Button("Start");
-        Button closeButton = new Button("Close");
-        Button settingButton = new Button("Setting");
-        // Give each button its functionality
-        startButton.setOnAction(e -> {
-            this.gameScene = new Scene(createGameScene());
-            window.setScene(this.gameScene);
-        });
-        settingButton.setOnAction(e -> {
-            this.settingScene = new Scene(createSettingScene());
-            window.setScene(this.settingScene);
-        });
-        closeButton.setOnAction(e -> {
-            window.close();
-        });
-
-        vbox.getChildren().addAll(startButton, settingButton, closeButton);
-        return root;
+    // Return tile at position i,j
+    public Tile getTile(int i, int j) {
+        return this.board[i][j];
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // This method creates the main game scene
-    // This scene includes the gameSceneMenu and the mineField
-    private Parent createGameScene() {
-        Pane root = new Pane();
-        root.setPrefSize(windowSizeX, windowSizeY);
 
-        HBox menuPane = new HBox();
-        menuPane.getChildren().add(createGameSceneMenu());
-
-        VBox vbox = new VBox();
-        mineField = createMineField();
-        vbox.getChildren().addAll(menuPane, mineField);
-        root.getChildren().add(vbox);
-
-        ScrollPane sp = new ScrollPane();
-        sp.setContent(root);
-        return sp;
+    // Check if player lost a game
+    // Player loses by revealing a mine
+    public boolean lose()
+    {
+        return this.gameOver;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // Create a menu pane for the game scene
-    // This pane consists of few buttons of different functionality
-    private HBox createGameSceneMenu() {
-        HBox menu = new HBox();
-        // Create buttons
-        Button homeButton = new Button("Home");
-        Button newButton = new Button("New Game");
-        Button settingButton = new Button("Setting");
-        Button closeButton = new Button("Close");
-        // Assign button functionalities
-        homeButton.setOnAction(e -> {
-            window.setScene(homeScene);
-        });
-        newButton.setOnAction(e -> {
-            // start a new game  <---------------fix later
-        });
-        settingButton.setOnAction(e ->{
-            if(settingScene == null) {
-                settingScene = new Scene(createSettingScene());
-            }
-            window.setScene(settingScene);
-        });
-        closeButton.setOnAction(e -> {
-            window.close();
-        });
-        menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton);
-        return menu;
+
+    // Check if player wins
+    // Player wins by flagging all mines or reveal all safe tiles
+    public boolean win()
+    {
+        return
+        this.numFlags == this.numMines ||
+        this.height()*this.width() - this.numVisible == this.numMines ||
+        this.numFlags + this.numVisible == this.height()*this.width();
+
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private GridPane createMineField() {
-        GridPane gamePane = new GridPane();
-        gamePane.setHgap(1);
-        gamePane.setVgap(1);
-        // Draw all tiles in the mine
-        for(int i = 0; i < this.fieldSizeX; i++) {
-            for(int j = 0; j < this.fieldSizeY; j++) {
-                Tile tile = new Tile();
-                gamePane.add(tile, i, j);
+
+    // Whether check is needed for this tile
+    protected boolean needCheck(int row, int col)
+    {
+        return this.board[row][col].check;
+    }
+
+    // Set check to false, which mean solver can skip this tile while searching
+    // for move
+    protected void skip(int row, int col)
+    {
+        this.board[row][col].check = false;
+    }
+
+    // Check if all mines are flagged
+    public boolean allFlagged()
+    {
+        for(int r=0; r<this.height(); r++)
+        {
+            for(int c=0; c<this.width(); c++)
+            {
+                if(this.board[r][c].mine == true)
+                {
+                    if(this.isFlagged(r,c))
+                    {
+                        return false;
+                    }
+                }
             }
         }
-        return gamePane;
+        return true;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // Create setting scene that allows player to change game setting
-    // This scene includes some dropdown menus that allow player to select
-    // size of mine field and game difficulty; it also contains 2 buttons for
-    // saving and discarding changes
-    private Parent createSettingScene() {
-        Pane root = new Pane();
-        root.setPrefSize(200,200);
-        VBox optionBox = new VBox();
 
-        // Drop down option for mine field size
-        HBox fieldSizeBox= new HBox();
-        Label fieldSizeLabel = new Label("Field Size");
-        Label xLabel = new Label("X");
-        ChoiceBox<Integer> fieldSizeXChoiceBox = new ChoiceBox<Integer>();
-        ChoiceBox<Integer> fieldSizeYChoiceBox = new ChoiceBox<Integer>();
-        for(int i = 5; i <= 100; i+=5) {                 // Add all options
-            fieldSizeXChoiceBox.getItems().add(i);
-            fieldSizeYChoiceBox.getItems().add(i);
+    // Check if a tile is visible
+    public boolean isVisible(int row, int col)
+    {
+        return this.board[row][col].visible;
+    }
+
+    // Check if a tile has a flag
+    public boolean isFlagged(int row, int col)
+    {
+        return this.board[row][col].flag;
+    }
+
+    // Return number of surrounding mines
+    public int numSurroundingMines(int row, int col)
+    {
+        return this.board[row][col].numSurroundingMines;
+    }
+
+    // Return game width
+    public int width()
+    {
+        return this.board[0].length;
+    }
+
+    // Return game height
+    public int height()
+    {
+        return this.board.length;
+    }
+
+    // Flag a tile and increment numFlags
+    public void flag(int r, int c)
+    {
+        this.board[r][c].flag = true;
+        this.numFlags++;
+    }
+
+    // Unflag a tile and decrement numFlags
+    public void unflag(int r, int c)
+    {
+        this.board[r][c].flag = false;
+        this.numFlags--;
+    }
+
+    // Return difficulty of the game
+    public String gameDifficulty()
+    {
+        return difficulty;
+    }
+
+    // Initialize board, create tiles for each position on board
+    public void initBoard()
+    {
+        for(int r = 0; r < this.height(); r++)
+        {
+            for(int c = 0; c < this.width(); c++)
+            {
+                this.board[r][c] = new Tile(r,c,false);
+            }
         }
-        fieldSizeXChoiceBox.setValue(this.fieldSizeX);    // default values
-        fieldSizeYChoiceBox.setValue(this.fieldSizeY);
-
-        // Buttons for saving and discarding changes
-        HBox saveBox = new HBox();
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
-        saveButton.setOnAction(e -> {
-            this.fieldSizeX = fieldSizeXChoiceBox.getValue();
-            this.fieldSizeY= fieldSizeYChoiceBox.getValue();
-            this.window.setScene(this.homeScene);
-        });
-        cancelButton.setOnAction( e -> {
-            this.window.setScene(this.homeScene);
-        });
-
-        fieldSizeBox.getChildren().addAll(fieldSizeLabel, fieldSizeXChoiceBox, xLabel, fieldSizeYChoiceBox);
-        saveBox.getChildren().addAll(saveButton, cancelButton);
-        optionBox.getChildren().addAll(fieldSizeBox, saveBox);
-        root.getChildren().add(optionBox);
-        return root;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    // Generate game after first move
+    public void generate(int r, int c)
+    {
+        this.fresh = false;
+        this.fmRow = r;
+        this.fmCol = c;
+        Generator gnrt = new Generator();
+        gnrt.smartGenerate(this, this.numMines);
+        //gnrt.smartGenerate(this, this.numMines);
+        this.numVisible++;
+        this.board[r][c].visible = true;
+        // reveal adjacent tiles when it's blank tile
+        if(this.board[r][c].numSurroundingMines == 0)
+        {
+            this.revealNeighbor(r,c);
+        }
+    }
+
+    // Reveal a tile that player choose, check if the move is first move,
+    // generate game after first move; check if the tile is a mine, game is
+    // over if so, reveal its neighbors if a tile is blank tile
+    public void reveal(int r, int c)
+    {
+        if(this.fresh)
+        {
+            this.generate(r, c);
+        }
+        else
+        {
+            if(this.board[r][c].mine == true) // Check if a tile is a mine
+            {
+                this.gameOver = true;
+                this.revealAll();
+            }
+            else
+            {
+                if(this.board[r][c].visible == false)
+                {
+                    this.numVisible++;
+                    this.board[r][c].visible = true;
+                    // reveal adjacent tiles when it's blank tile
+                    if(this.board[r][c].numSurroundingMines == 0)
+                    {
+                        //this.skip(r,c);
+                        this.revealNeighbor(r,c);
+                    }
+                }
+            }
+        }
+    }
+
+    // Reveal safe neighboring tiles, Recursively revealNeighbor for the
+    // adjacent safe tiles, stop until adjcent tile that has more than 0
+    // numSurroundingMines
+    protected void revealNeighbor(int r, int c)
+    {
+        try{                                     // Up left
+            this.reveal(r-1,c-1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Up
+            this.reveal(r-1,c);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Up right
+            this.reveal(r-1,c+1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Left
+            this.reveal(r,c-1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Right
+            this.reveal(r,c+1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Down left
+            this.reveal(r+1,c-1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Down
+            this.reveal(r+1,c);
+        }
+        catch(IndexOutOfBoundsException e) {};
+        try{                                     // Down right
+            this.reveal(r+1,c+1);
+        }
+        catch(IndexOutOfBoundsException e) {};
+    }
+
+    // Reveal all tiles and print game
+    protected void revealAll()
+    {
+        for(int r = 0; r < this.height(); r++)
+        {
+            for(int c = 0; c < this.width(); c++)
+            {
+                this.board[r][c].visible = true;
+            }
+        }
+        System.out.println(this);
+    }
+
+    // Cover all tiles
+    protected void coverAll()
+    {
+        for(int r = 0; r < this.height(); r++)
+        {
+            for(int c = 0; c < this.width(); c++)
+            {
+                this.board[r][c].visible = false;
+            }
+        }
+        this.numVisible = 0;
+    }
+
+    // Unflag all tiles
+    protected void clearAllFlags()
+    {
+        for(int r = 0; r < this.height(); r++)
+        {
+            for(int c = 0; c < this.width(); c++)
+            {
+                this.board[r][c].flag = false;
+            }
+        }
+        this.numFlags = 0;
+    }
+
+    // A cheat for testing purpose ONLY, draw board with all mines marked
+    //    0 1 2 3
+    //-------------
+    // 0|   1 1 1 |
+    // 1| 1 2 * 1 |
+    // 2| 1 * 2 1 |
+    // 3| 1 1 1   |
+    //-------------
+    protected void cheat()
+    {
+        StringBuilder repr = new StringBuilder("   ");
+        for(int i = 0; i < this.width(); i++)
+        {
+            repr.append(String.format("%2d",i));
+        }
+        repr.append("\n");
+        repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
+        repr.append("\n");
+        for(int r = 0; r < this.height(); r++)
+        {
+            repr.append(String.format("%2d| ",r));
+            for(int c = 0; c < this.width(); c++)
+            {
+                if(this.board[r][c].mine == true)
+                {
+                    repr.append("* ");
+                }
+                else if(this.board[r][c].numSurroundingMines == 0)
+                {
+                    repr.append("  ");
+                }
+                else
+                {
+                    repr.append(this.board[r][c].numSurroundingMines + " ");
+                }
+            }
+            repr.append("|\n");
+        }
+        repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
+        System.out.println(repr.toString());
+    }
+
+    // String representation of game board for player
+    // '?' for a unrevealed tile
+    // '*' for a revealed tile with mine
+    // ' ' for a revealed empty tile
+    // '!' for tile with flag
+    // '1-8' represen number of mines in surrounding tiles
+    //    0 1 2 3
+    //-------------
+    // 0| ? ? ? ? |
+    // 1| ? ? ! ? |
+    // 2| ? ? ? ? |
+    // 3| ? ? ? ? |
+    //-------------
+    public String toString()
+    {
+        StringBuilder repr = new StringBuilder("   ");
+        for(int i = 0; i < this.width(); i++)
+        {
+            repr.append(String.format("%2d",i));
+        }
+        repr.append("\n");
+        repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
+        repr.append("\n");
+        for(int r = 0; r < this.height(); r++)
+        {
+            repr.append(String.format("%2d| ",r));
+            for(int c = 0; c < this.width(); c++)
+            {
+                if(this.board[r][c].flag == true)
+                {
+                    repr.append("! ");
+                }
+                else if(this.board[r][c].visible == false)
+                {
+                    repr.append("? ");
+                }
+                else if(this.board[r][c].mine == true)
+                {
+                    repr.append("* ");
+                }
+                else if(this.board[r][c].numSurroundingMines == 0)
+                {
+                    repr.append("  ");
+                }
+                else
+                {
+                    repr.append(this.board[r][c].numSurroundingMines + " ");
+                }
+            }
+            repr.append("|\n");
+        }
+        repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
+        return repr.toString();
+    }
+
+    // Show game information such as number of mine, game difficulty etc.
+    public String gameInfo()
+    {
+        return String.format("Number of Mines: %s\n",this.numMines) +
+        String.format("Number of Flags: %s\n", this.numFlags) +
+        String.format("Number of Visible: %s\n", this.numVisible);
+    }
+
+    // Return a preset game, modify as needed
+    private static MineSweeper presetGame()
+    {
+        Generator gnrt = new Generator();
+        MineSweeper game = new MineSweeper(6,6,"easy");
+        for(int r = 0; r < game.height(); r++)
+        {
+            for(int c = 0; c < game.width(); c++)
+            {
+                game.board[r][c].mine = false;
+                game.board[r][c].visible = false;
+                game.board[r][c].numSurroundingMines = 0;
+            }
+        }
+        // Modify this part to preset game
+        game.board[1][1].mine = true;
+        game.board[1][1].mine = true;
+        game.board[1][1].mine = true;
+        gnrt.countAdjacentMines(game);
+        return game;
+    }
 
 }
