@@ -25,6 +25,10 @@ public class Tile extends StackPane {
 	protected int row, col;
 	// Whether check is need for this tile, false means no check need
 	protected boolean check;
+	// Rectangle representing the tile
+	protected Rectangle rect;
+	// Text for  number of surrouding mine
+	protected Text txt;
 
 	// Tile class constructor, initialize mine field,
 	public Tile(int row, int col, boolean mine) {
@@ -35,33 +39,55 @@ public class Tile extends StackPane {
 		this.flag = false;
 		this.visible = false;
 		this.numSurroundingMines = 0;
-		Rectangle tile = new Rectangle(20, 20);
-		tile.setFill(Color.GRAY);
-		Text txt = new Text();
-		this.getChildren().addAll(tile, txt);
+		this.rect = new Rectangle(20, 20);
+		rect.setFill(Color.GRAY);
+		this.txt = new Text();
+		this.txt.setFont(new Font(15));
+		this.txt.setTextAlignment(TextAlignment.CENTER);
+		this.txt.setFill(Color.BLACK);
+		this.txt.setVisible(false);
+		this.getChildren().addAll(rect, txt);
+		/*Text txt = new Text();
+		this.getChildren().addAll(rect, txt);
 		txt.setVisible(false);
 		txt.setFill(Color.BLACK);
 		txt.setFont(new Font(15));
 		txt.setTextAlignment(TextAlignment.CENTER);
-		tile.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		/*tile.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
 				tile.setFill(getColor());
 				txt.setText(getText());
 				txt.setVisible(true);
 			}
-		});
+		});*/
 	}
 
+	// Reveal this tile
+	public void reveal() {
+		txt.setText(getText());
+		rect.setFill(getColor());
+		txt.setVisible(true);
+	}
+
+	// Return appropriate color for this tile
 	private Color getColor() {
 		return this.mine == true ? Color.RED : Color.WHITE;
 	}
 
+	// Return number of surrounding mine as Text
 	private String getText() {
 		if(this.mine == true) {
 			return "";
 		} else {
 			return numSurroundingMines == 0 ? "" : String.format("%d", numSurroundingMines);
 		}
+	}
+
+	public boolean isMine() {
+		return mine;
+	}
+	public int getNumSurroundingMines() {
+		return numSurroundingMines;
 	}
 }

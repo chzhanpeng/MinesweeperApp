@@ -21,7 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
-
+import javafx.scene.Node;
 
 
 public class MinesweeperApp extends Application {
@@ -63,19 +63,35 @@ public class MinesweeperApp extends Application {
     private GridPane createMineField() {
         game = new MineSweeper(fieldSizeX, fieldSizeY, "easy");
         Generator grt = new Generator();
-        grt.randomGenerate(game, 400/6);
-        game.cheat();
+        grt.randomGenerate(game, 5);
+        //game.cheat();
 
 
         GridPane gamePane = new GridPane();
         gamePane.setHgap(1);
         gamePane.setVgap(1);
+
+        // Create event filter that only allow tiles to detect mouse event
+        EventHandler<MouseEvent> filter = new EventHandler<MouseEvent> (){
+            @Override
+            public void handle(MouseEvent e) {
+                Node source = (Node) e.getSource();
+                Integer row = GridPane.getRowIndex(source);
+                Integer col = GridPane.getColumnIndex(source);
+                //System.out.printf("%d %d\n", row, col);
+                game.reveal(row, col);
+            }
+        };
+
         // Draw all tiles in the mine
         for(int i = 0; i < this.fieldSizeX; i++) {
             for(int j = 0; j < this.fieldSizeY; j++) {
-                gamePane.add(game.getTile(i, j), j , i);
+                gamePane.add(game.getTile(i, j), j, i);
+                game.getTile(i, j).addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
             }
         }
+
+
         return gamePane;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

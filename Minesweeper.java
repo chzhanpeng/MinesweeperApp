@@ -183,7 +183,16 @@ public class MineSweeper {
     // over if so, reveal its neighbors if a tile is blank tile
     public void reveal(int r, int c)
     {
-        if(this.fresh)
+        Tile tile = getTile(r,c);
+        if(tile.isMine()) {
+            this.revealAll();
+        } else {
+            tile.reveal();
+            if(tile.getNumSurroundingMines() == 0) {
+                revealNeighbor(r,c);
+            }
+        }
+        /*if(this.fresh)
         {
             this.generate(r, c);
         }
@@ -200,6 +209,7 @@ public class MineSweeper {
                 {
                     this.numVisible++;
                     this.board[r][c].visible = true;
+                    getTile(r,c).reveal();
                     // reveal adjacent tiles when it's blank tile
                     if(this.board[r][c].numSurroundingMines == 0)
                     {
@@ -208,7 +218,7 @@ public class MineSweeper {
                     }
                 }
             }
-        }
+        }*/
     }
 
     // Reveal safe neighboring tiles, Recursively revealNeighbor for the
@@ -257,10 +267,10 @@ public class MineSweeper {
         {
             for(int c = 0; c < this.width(); c++)
             {
-                this.board[r][c].visible = true;
+                getTile(r,c).reveal();
             }
         }
-        System.out.println(this);
+        //System.out.println(this);
     }
 
     // Cover all tiles
