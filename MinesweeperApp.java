@@ -63,8 +63,8 @@ public class MinesweeperApp extends Application {
     private GridPane createMineField() {
         game = new MineSweeper(fieldSizeX, fieldSizeY, "easy");
         Generator grt = new Generator();
-        grt.randomGenerate(game, 5);
-        //game.cheat();
+        grt.randomGenerate(game, 50);
+        game.cheat();
 
 
         GridPane gamePane = new GridPane();

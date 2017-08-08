@@ -68,6 +68,7 @@ public class Tile extends StackPane {
 		txt.setText(getText());
 		rect.setFill(getColor());
 		txt.setVisible(true);
+		visible = true;
 	}
 
 	// Return appropriate color for this tile
@@ -89,5 +90,8 @@ public class Tile extends StackPane {
 	}
 	public int getNumSurroundingMines() {
 		return numSurroundingMines;
+	}
+	public boolean isRevealable() {
+		return !visible;
 	}
 }

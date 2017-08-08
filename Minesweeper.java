@@ -183,12 +183,11 @@ public class MineSweeper {
     // over if so, reveal its neighbors if a tile is blank tile
     public void reveal(int r, int c)
     {
-        Tile tile = getTile(r,c);
-        if(tile.isMine()) {
-            this.revealAll();
+        if(board[r][c].isMine()) {
+            revealAll();
         } else {
-            tile.reveal();
-            if(tile.getNumSurroundingMines() == 0) {
+            board[r][c].reveal();
+            if(board[r][c].getNumSurroundingMines() == 0) {
                 revealNeighbor(r,c);
             }
         }
@@ -224,53 +223,56 @@ public class MineSweeper {
     // Reveal safe neighboring tiles, Recursively revealNeighbor for the
     // adjacent safe tiles, stop until adjcent tile that has more than 0
     // numSurroundingMines
-    protected void revealNeighbor(int r, int c)
-    {
-        try{                                     // Up left
-            this.reveal(r-1,c-1);
+    protected void revealNeighbor(int r, int c) {
+        if(r != 0 && c != 0) {
+            if(board[r-1][c-1].isRevealable()) {
+                reveal(r-1,c-1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Up
-            this.reveal(r-1,c);
+        if(r != 0) {
+            if(board[r-1][c].isRevealable()) {
+                reveal(r-1,c);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Up right
-            this.reveal(r-1,c+1);
+        if(r != 0 && c != width()-1) {
+            if(board[r-1][c+1].isRevealable()) {
+                reveal(r-1,c+1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Left
-            this.reveal(r,c-1);
+        if(c != 0) {
+            if(board[r][c-1].isRevealable()) {
+                reveal(r,c-1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Right
-            this.reveal(r,c+1);
+        if(c != width()-1) {
+            if(board[r][c+1].isRevealable()) {
+                reveal(r,c+1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Down left
-            this.reveal(r+1,c-1);
+        if(r != height()-1 && c != 0) {
+            if(board[r+1][c-1].isRevealable()) {
+                reveal(r+1,c-1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Down
-            this.reveal(r+1,c);
+        if(r != height()-1) {
+            if(board[r+1][c].isRevealable()) {
+                reveal(r+1,c);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
-        try{                                     // Down right
-            this.reveal(r+1,c+1);
+        if(r != height()-1 && c != width()-1){
+            if(board[r+1][c+1].isRevealable()) {
+                reveal(r+1,c+1);
+            }
         }
-        catch(IndexOutOfBoundsException e) {};
     }
 
     // Reveal all tiles and print game
-    protected void revealAll()
-    {
-        for(int r = 0; r < this.height(); r++)
-        {
-            for(int c = 0; c < this.width(); c++)
-            {
+    protected void revealAll() {
+        for(int r = 0; r < this.height(); r++) {
+            for(int c = 0; c < this.width(); c++) {
                 getTile(r,c).reveal();
             }
         }
-        //System.out.println(this);
     }
 
     // Cover all tiles
