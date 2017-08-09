@@ -47,20 +47,6 @@ public class Tile extends StackPane {
 		this.txt.setFill(Color.BLACK);
 		this.txt.setVisible(false);
 		this.getChildren().addAll(rect, txt);
-		/*Text txt = new Text();
-		this.getChildren().addAll(rect, txt);
-		txt.setVisible(false);
-		txt.setFill(Color.BLACK);
-		txt.setFont(new Font(15));
-		txt.setTextAlignment(TextAlignment.CENTER);
-		/*tile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent t) {
-				tile.setFill(getColor());
-				txt.setText(getText());
-				txt.setVisible(true);
-			}
-		});*/
 	}
 
 	// Reveal this tile
@@ -84,14 +70,28 @@ public class Tile extends StackPane {
 			return numSurroundingMines == 0 ? "" : String.format("%d", numSurroundingMines);
 		}
 	}
-
+	// Return true if this tile is a mine
 	public boolean isMine() {
 		return mine;
 	}
+	// Return number of surrounding mines
 	public int getNumSurroundingMines() {
 		return numSurroundingMines;
 	}
+	// Return true if this tile is revealable
 	public boolean isRevealable() {
 		return !visible;
+	}
+	// Flag this tile
+	public void flag() {
+		flag = true;
+	}
+	// Remove flag
+	public void deflag() {
+		flag = false;
+	}
+	// Return true if this tile is flagged
+	public boolean isFlagged() {
+		return flag;
 	}
 }

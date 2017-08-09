@@ -37,7 +37,8 @@ public class MinesweeperApp extends Application {
     private int fieldSizeX, fieldSizeY;
     // pane for mine field
     private GridPane mineField;
-    private MineSweeper game;
+    private Minesweeper game;
+    private String difficulty;
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Application starts runnning here
@@ -48,11 +49,12 @@ public class MinesweeperApp extends Application {
         tileSize = 20;
         fieldSizeX = 20;
         fieldSizeY = 20;
+        difficulty = "easy";
         windowSizeX = findWindowSizeX();
         windowSizeY = findWindowSizeY();
         //window.setMinWidth(450);
         //window.setMinHeight(450);
-        primaryStage.setTitle("MineSweeper");
+        primaryStage.setTitle("Minesweeper");
 
         // Initilize home scene and set as default scene
         this.homeScene = new Scene(createHomeScene());
@@ -61,11 +63,7 @@ public class MinesweeperApp extends Application {
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private GridPane createMineField() {
-        game = new MineSweeper(fieldSizeX, fieldSizeY, "easy");
-        Generator grt = new Generator();
-        grt.randomGenerate(game, 50);
-        game.cheat();
-
+        game = new Minesweeper(fieldSizeX, fieldSizeY, difficulty);
 
         GridPane gamePane = new GridPane();
         gamePane.setHgap(1);
@@ -95,27 +93,11 @@ public class MinesweeperApp extends Application {
         return gamePane;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // Tile class for tiles in the game
-    /*private class Tile extends Parent {
-
-        public Tile() {
-            Rectangle tile = new Rectangle(20, 20);
-            tile.setFill(Color.BLUE);
-            this.getChildren().add(tile);
-            tile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent t) {
-                    tile.setFill(Color.RED);
-                }
-            });
-        }
-    }*/
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the home scene
     // MenuScene contains start, setting, and close buttons
     private Parent createHomeScene() {
         Pane root = new Pane();
-        root.setPrefSize(windowSizeX, windowSizeY);
+        root.setPrefSize(windowSizeY, windowSizeX);
         VBox vbox = new VBox();
         root.getChildren().add(vbox);
 
@@ -202,38 +184,48 @@ public class MinesweeperApp extends Application {
         root.setPrefSize(windowSizeX, windowSizeY);
         VBox optionBox = new VBox();
 
-        // Drop down option for mine field size
+        // Choose game size
         HBox fieldSizeBox= new HBox();
         Label fieldSizeLabel = new Label("Field Size");
         Label xLabel = new Label("X");
-        ChoiceBox<Integer> fieldSizeXChoiceBox = new ChoiceBox<Integer>();
-        ChoiceBox<Integer> fieldSizeYChoiceBox = new ChoiceBox<Integer>();
-        for(int i = 5; i <= 40; i+=5) {                 // Add all options
-            fieldSizeXChoiceBox.getItems().add(i);
-            fieldSizeYChoiceBox.getItems().add(i);
+        ChoiceBox<Integer> fieldSizeXCB = new ChoiceBox<Integer>();
+        ChoiceBox<Integer> fieldSizeYCB = new ChoiceBox<Integer>();
+        for(int i = 5; i <= 40; i+=5) {
+            fieldSizeXCB.getItems().add(i);
+            fieldSizeYCB.getItems().add(i);
         }
-        fieldSizeXChoiceBox.setValue(this.fieldSizeX);    // default values
-        fieldSizeYChoiceBox.setValue(this.fieldSizeY);
+        fieldSizeXCB.setValue(this.fieldSizeX);
+        fieldSizeYCB.setValue(this.fieldSizeY);
+
+        // Choose game diffculty
+        ChoiceBox<String> difficultyCB = new ChoiceBox<String>();
+        difficultyCB.getItems().addAll("easy", "medium", "hard");
+        difficultyCB.setValue("easy");
+        HBox difficultyBox = new HBox();
+        Label difficultyLabel = new Label("Difficulty");
+        difficultyBox.getChildren().addAll(difficultyLabel, difficultyCB);
+
 
         // Buttons for saving and discarding changes
         HBox saveBox = new HBox();
         Button saveButton = new Button("Save");
         Button cancelButton = new Button("Cancel");
         saveButton.setOnAction(e -> {
-            this.fieldSizeX = fieldSizeXChoiceBox.getValue();
-            this.fieldSizeY= fieldSizeYChoiceBox.getValue();
-            this.windowSizeX = findWindowSizeX();
-            this.windowSizeY = findWindowSizeY();
-            this.window.setScene(this.homeScene);
-            this.gameScene = new Scene(createGameScene());
+            fieldSizeX = fieldSizeXCB.getValue();
+            fieldSizeY= fieldSizeYCB.getValue();
+            difficulty = difficultyCB.getValue();
+            windowSizeX = findWindowSizeX();
+            windowSizeY = findWindowSizeY();
+            window.setScene(this.homeScene);
+            gameScene = new Scene(createGameScene());
         });
         cancelButton.setOnAction( e -> {
             this.window.setScene(this.homeScene);
         });
 
-        fieldSizeBox.getChildren().addAll(fieldSizeLabel, fieldSizeXChoiceBox, xLabel, fieldSizeYChoiceBox);
+        fieldSizeBox.getChildren().addAll(fieldSizeLabel, fieldSizeXCB, xLabel, fieldSizeYCB);
         saveBox.getChildren().addAll(saveButton, cancelButton);
-        optionBox.getChildren().addAll(fieldSizeBox, saveBox);
+        optionBox.getChildren().addAll(fieldSizeBox, difficultyBox, saveBox);
         root.getChildren().add(optionBox);
         return root;
     }
@@ -244,14 +236,14 @@ public class MinesweeperApp extends Application {
         if(fieldSizeX < 10) {
             return 200;
         }else{
-            return tileSize * (fieldSizeX + 1);
+            return tileSize * (fieldSizeY + 1);
         }
     }
     public int findWindowSizeY() {
         if(fieldSizeY < 10) {
             return 200;
         }else{
-            return tileSize * (fieldSizeY + 1);
+            return tileSize * (fieldSizeX + 1) + 3;
         }
     }
 }
