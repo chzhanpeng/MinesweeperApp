@@ -9,7 +9,7 @@ public class Minesweeper {
     // Total number of mine of a game
     protected int numMines;
     // Total visible tiles
-    protected int numVisible;
+    protected int numRevealed;
     // Total tiles with flag
     protected int numFlags;
     // Keep track of first move, this helps in generating mines
@@ -21,7 +21,7 @@ public class Minesweeper {
     public Minesweeper(int width, int height, String difficulty)
     {
         this.board = new Tile[width][height];
-        this.numVisible = 0;
+        this.numRevealed = 0;
         this.numMines = 0;
         this.numFlags = 0;
         this.fresh = true;
@@ -66,8 +66,8 @@ public class Minesweeper {
     {
         return
         this.numFlags == this.numMines ||
-        this.height()*this.width() - this.numVisible == this.numMines ||
-        this.numFlags + this.numVisible == this.height()*this.width();
+        this.height()*this.width() - this.numRevealed == this.numMines ||
+        this.numFlags + this.numRevealed == this.height()*this.width();
     }
 
     // Return first move row index
@@ -127,8 +127,8 @@ public class Minesweeper {
     // Flag a tile and increment numFlags
     public void flag(int r, int c)
     {
-        this.board[r][c].flag();
-        this.numFlags++;
+        board[r][c].flag();
+        numFlags++;
     }
 
     // Unflag a tile and decrement numFlags
@@ -171,6 +171,7 @@ public class Minesweeper {
                 {
                     revealNeighbor(r,c);
                 }
+                numRevealed++;
             }
         }
     }
@@ -260,7 +261,7 @@ public class Minesweeper {
                 this.board[r][c].visible = false;
             }
         }
-        this.numVisible = 0;
+        this.numRevealed = 0;
     }
 
     // Unflag all tiles

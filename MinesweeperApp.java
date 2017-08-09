@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -76,8 +77,12 @@ public class MinesweeperApp extends Application {
                 Node source = (Node) e.getSource();
                 Integer row = GridPane.getRowIndex(source);
                 Integer col = GridPane.getColumnIndex(source);
-                //System.out.printf("%d %d\n", row, col);
-                game.reveal(row, col);
+
+                if(e.getButton() == MouseButton.PRIMARY) {
+                    game.reveal(row, col);
+                } else if(e.getButton() == MouseButton.SECONDARY) {
+                    game.flag(row, col);
+                }
             }
         };
 
@@ -88,8 +93,6 @@ public class MinesweeperApp extends Application {
                 game.getTile(i, j).addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
             }
         }
-
-
         return gamePane;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -236,14 +239,14 @@ public class MinesweeperApp extends Application {
         if(fieldSizeX < 10) {
             return 200;
         }else{
-            return tileSize * (fieldSizeY + 1);
+            return (tileSize+1) * fieldSizeY;
         }
     }
     public int findWindowSizeY() {
         if(fieldSizeY < 10) {
             return 200;
         }else{
-            return tileSize * (fieldSizeX + 1) + 3;
+            return (tileSize+1) * fieldSizeX;
         }
     }
 }

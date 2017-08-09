@@ -85,6 +85,7 @@ public class Tile extends StackPane {
 	// Flag this tile
 	public void flag() {
 		flag = true;
+		rect.setFill(Color.GREEN);
 	}
 	// Remove flag
 	public void deflag() {
