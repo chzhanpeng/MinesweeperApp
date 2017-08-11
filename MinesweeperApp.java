@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.text.Font;
 
 
 public class MinesweeperApp extends Application {
@@ -82,6 +83,13 @@ public class MinesweeperApp extends Application {
                     game.reveal(row, col);
                 } else if(e.getButton() == MouseButton.SECONDARY) {
                     game.flag(row, col);
+                }
+
+                if(game.win()) {
+                    window.setScene(new Scene(createEndingScene("You Win")));
+                }
+                if(game.getTile(row, col).isMine()) {
+                    window.setScene(new Scene(createEndingScene("You Lose")));
                 }
             }
         };
@@ -177,6 +185,27 @@ public class MinesweeperApp extends Application {
         return menu;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private Parent createEndingScene(String message) {
+        StackPane root = new StackPane();
+
+        VBox optionBox = new VBox();
+        Label endingMsg = new Label(message);
+        endingMsg.setTextFill(Color.RED);
+        endingMsg.setFont(new Font(windowSizeX * .3));
+        Button returnButton = new Button("Return");
+        Button newButton = new Button("New Game");
+        Button menuButton = new Button("Menu");
+        Button exitButton = new Button("Exit");
+
+        optionBox.getChildren().addAll(endingMsg, returnButton, newButton, menuButton, exitButton);
+
+        root.getChildren().addAll(gameScene.getRoot(), optionBox);
+
+
+
+        return root;
+
+    }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create setting scene that allows player to change game setting
     // This scene includes some dropdown menus that allow player to select
