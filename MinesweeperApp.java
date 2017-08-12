@@ -30,16 +30,17 @@ public class MinesweeperApp extends Application {
 
     // The window of the application
     private Stage window;
-    // Scenes of the application
-    private Scene homeScene, gameScene, settingScene;
     // Size of window
     private int windowSizeX, windowSizeY;
     // Size of the mine
     private int tileSize;
+    // Size of the mine field
     private int fieldSizeX, fieldSizeY;
     // pane for mine field
     private GridPane mineField;
+    // Stores all information about the game
     private Minesweeper game;
+    // Game difficulty
     private String difficulty;
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -47,30 +48,25 @@ public class MinesweeperApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         window = primaryStage;
+        window.setMinWidth(0);
         // Initialize default values;
         tileSize = 20;
         fieldSizeX = 20;
         fieldSizeY = 20;
         difficulty = "easy";
-        windowSizeX = findWindowSizeX();
-        windowSizeY = findWindowSizeY();
-        //window.setMinWidth(450);
-        //window.setMinHeight(450);
+        windowSizeY = findWindowSizeX();
+        windowSizeX = findWindowSizeY();
         primaryStage.setTitle("Minesweeper");
-
         // Initilize home scene and set as default scene
-        this.homeScene = new Scene(createHomeScene());
-        primaryStage.setScene(homeScene);
+        primaryStage.setScene(createHomeScene());
         primaryStage.show();
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private GridPane createMineField() {
+    private void createMineField() {
         game = new Minesweeper(fieldSizeX, fieldSizeY, difficulty);
-
-        GridPane gamePane = new GridPane();
-        gamePane.setHgap(1);
-        gamePane.setVgap(1);
-
+        mineField = new GridPane();
+        mineField.setHgap(1);
+        mineField.setVgap(1);
         // Create event filter that only allow tiles to detect mouse event
         EventHandler<MouseEvent> filter = new EventHandler<MouseEvent> (){
             @Override
@@ -78,85 +74,77 @@ public class MinesweeperApp extends Application {
                 Node source = (Node) e.getSource();
                 Integer row = GridPane.getRowIndex(source);
                 Integer col = GridPane.getColumnIndex(source);
-
                 if(e.getButton() == MouseButton.PRIMARY) {
                     game.reveal(row, col);
                 } else if(e.getButton() == MouseButton.SECONDARY) {
                     game.flag(row, col);
                 }
-
                 if(game.win()) {
-                    window.setScene(new Scene(createEndingScene("You Win")));
+                    window.setScene(createEndingScene("You Win"));
                 }
                 if(game.getTile(row, col).isMine()) {
-                    window.setScene(new Scene(createEndingScene("You Lose")));
+                    window.setScene(createEndingScene("You Lose"));
                 }
             }
         };
-
         // Draw all tiles in the mine
         for(int i = 0; i < this.fieldSizeX; i++) {
             for(int j = 0; j < this.fieldSizeY; j++) {
-                gamePane.add(game.getTile(i, j), j, i);
+                mineField.add(game.getTile(i, j), j, i);
                 game.getTile(i, j).addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
             }
         }
-        return gamePane;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the home scene
     // MenuScene contains start, setting, and close buttons
-    private Parent createHomeScene() {
-        Pane root = new Pane();
+    private Scene createHomeScene() {
+        StackPane root = new StackPane();
+        root.setAlignment(Pos.CENTER);
         root.setPrefSize(windowSizeY, windowSizeX);
-        VBox vbox = new VBox();
-        root.getChildren().add(vbox);
-
+        VBox optionBox = new VBox();
+        optionBox.setAlignment(Pos.CENTER);
+        root.getChildren().add(optionBox);
         // Create buttons
         Button startButton = new Button("Start");
         Button closeButton = new Button("Close");
         Button settingButton = new Button("Setting");
         // Give each button its functionality
         startButton.setOnAction(e -> {
-            this.gameScene = new Scene(createGameScene());
-            window.setScene(this.gameScene);
+            System.out.println(window.getMinWidth());
+            System.out.println(window.getHeight());
+            window.setMinWidth(0);
+            window.setScene(createGameScene());
         });
         settingButton.setOnAction(e -> {
-            this.settingScene = new Scene(createSettingScene());
-            window.setScene(this.settingScene);
+            window.setScene(createSettingScene());
         });
         closeButton.setOnAction(e -> {
             window.close();
         });
-
-        vbox.getChildren().addAll(startButton, settingButton, closeButton);
-        return root;
+        optionBox.getChildren().addAll(startButton, settingButton, closeButton);
+        return new Scene(root);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the main game scene
     // This scene includes the gameSceneMenu and the mineField
-    private Parent createGameScene() {
+    private Scene createGameScene() {
         Pane root = new Pane();
         root.setPrefSize(windowSizeX, windowSizeY);
-
-        //HBox menuPane = new HBox();
-        //menuPane.getChildren().add(createGameSceneMenu());
-
         BorderPane bp = new BorderPane();
-        mineField = createMineField();
+        createMineField();
         //bp.setTop(menuPane);
         bp.setCenter(mineField);
         root.getChildren().add(bp);
-
         ScrollPane sp = new ScrollPane();
         sp.setContent(root);
         sp.fitToWidthProperty();
-        return sp;
+        return new Scene(sp);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create a menu pane for the game scene
     // This pane consists of few buttons of different functionality
-    private HBox createGameSceneMenu() {
+    /*private HBox createGameSceneMenu() {
         HBox menu = new HBox();
         menu.setMinHeight(40);
         menu.setStyle("-fx-background-color: rgb(173, 175, 174)");
@@ -173,37 +161,41 @@ public class MinesweeperApp extends Application {
             gameScene = new Scene(createGameScene());
         });
         settingButton.setOnAction(e ->{
-            if(settingScene == null) {
-                settingScene = new Scene(createSettingScene());
-            }
-            window.setScene(settingScene);
+            window.setScene(createSettingScene());
         });
         closeButton.setOnAction(e -> {
             window.close();
         });
         menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton);
         return menu;
-    }
+    }*/
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private Parent createEndingScene(String message) {
+    private Scene createEndingScene(String message) {
         StackPane root = new StackPane();
-
         VBox optionBox = new VBox();
+        optionBox.setAlignment(Pos.CENTER);
         Label endingMsg = new Label(message);
-        endingMsg.setTextFill(Color.RED);
-        endingMsg.setFont(new Font(windowSizeX * .3));
-        Button returnButton = new Button("Return");
+        endingMsg.setTextFill(Color.GREEN);
+        endingMsg.setFont(new Font(windowSizeX * .2));
+        //Button returnButton = new Button("Return");
         Button newButton = new Button("New Game");
-        Button menuButton = new Button("Menu");
+        Button settingButton = new Button("Setting");
         Button exitButton = new Button("Exit");
-
-        optionBox.getChildren().addAll(endingMsg, returnButton, newButton, menuButton, exitButton);
-
-        root.getChildren().addAll(gameScene.getRoot(), optionBox);
-
-
-
-        return root;
+        newButton.setOnAction(e -> {
+            mineField = null;
+            createMineField();
+            window.setScene(createGameScene());
+        });
+        settingButton.setOnAction(e -> {
+            mineField = null;
+            window.setScene(createSettingScene());
+        });
+        exitButton.setOnAction(e -> {
+            window.close();
+        });
+        optionBox.getChildren().addAll(endingMsg, newButton, settingButton, exitButton);
+        root.getChildren().addAll(mineField, optionBox);
+        return new Scene(root);
 
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -211,13 +203,14 @@ public class MinesweeperApp extends Application {
     // This scene includes some dropdown menus that allow player to select
     // size of mine field and game difficulty; it also contains 2 buttons for
     // saving and discarding changes
-    private Parent createSettingScene() {
-        Pane root = new Pane();
+    private Scene createSettingScene() {
+        StackPane root = new StackPane();
         root.setPrefSize(windowSizeX, windowSizeY);
         VBox optionBox = new VBox();
-
+        optionBox.setAlignment(Pos.CENTER);
         // Choose game size
         HBox fieldSizeBox= new HBox();
+        fieldSizeBox.setAlignment(Pos.CENTER);
         Label fieldSizeLabel = new Label("Field Size");
         Label xLabel = new Label("X");
         ChoiceBox<Integer> fieldSizeXCB = new ChoiceBox<Integer>();
@@ -228,18 +221,17 @@ public class MinesweeperApp extends Application {
         }
         fieldSizeXCB.setValue(this.fieldSizeX);
         fieldSizeYCB.setValue(this.fieldSizeY);
-
         // Choose game diffculty
         ChoiceBox<String> difficultyCB = new ChoiceBox<String>();
         difficultyCB.getItems().addAll("easy", "medium", "hard");
         difficultyCB.setValue("easy");
         HBox difficultyBox = new HBox();
+        difficultyBox.setAlignment(Pos.CENTER);
         Label difficultyLabel = new Label("Difficulty");
         difficultyBox.getChildren().addAll(difficultyLabel, difficultyCB);
-
-
         // Buttons for saving and discarding changes
         HBox saveBox = new HBox();
+        saveBox.setAlignment(Pos.CENTER);
         Button saveButton = new Button("Save");
         Button cancelButton = new Button("Cancel");
         saveButton.setOnAction(e -> {
@@ -248,34 +240,26 @@ public class MinesweeperApp extends Application {
             difficulty = difficultyCB.getValue();
             windowSizeX = findWindowSizeX();
             windowSizeY = findWindowSizeY();
-            window.setScene(this.homeScene);
-            gameScene = new Scene(createGameScene());
+            window.setScene(createHomeScene());
+            //createGameScene();
         });
         cancelButton.setOnAction( e -> {
-            this.window.setScene(this.homeScene);
+            this.window.setScene(createHomeScene());
         });
 
         fieldSizeBox.getChildren().addAll(fieldSizeLabel, fieldSizeXCB, xLabel, fieldSizeYCB);
         saveBox.getChildren().addAll(saveButton, cancelButton);
         optionBox.getChildren().addAll(fieldSizeBox, difficultyBox, saveBox);
         root.getChildren().add(optionBox);
-        return root;
+        return new Scene(root);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return a proper value for the size of the window based on the size of
     // tiles and the size of mineField
     public int findWindowSizeX() {
-        if(fieldSizeX < 10) {
-            return 200;
-        }else{
-            return (tileSize+1) * fieldSizeY;
-        }
+        return (tileSize+1) * fieldSizeX;
     }
     public int findWindowSizeY() {
-        if(fieldSizeY < 10) {
-            return 200;
-        }else{
-            return (tileSize+1) * fieldSizeX;
-        }
+        return (tileSize+1) * fieldSizeY;
     }
 }
