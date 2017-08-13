@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -24,7 +25,8 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class MinesweeperApp extends Application {
 
@@ -35,7 +37,7 @@ public class MinesweeperApp extends Application {
     // Size of the mine
     private int tileSize;
     // Size of the mine field
-    private int fieldSizeX, fieldSizeY;
+    private int numRows, numCols;
     // pane for mine field
     private GridPane mineField;
     // Stores all information about the game
@@ -48,14 +50,13 @@ public class MinesweeperApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         window = primaryStage;
-        window.setMinWidth(0);
         // Initialize default values;
         tileSize = 20;
-        fieldSizeX = 20;
-        fieldSizeY = 20;
+        numRows = 24;
+        numCols = 24;
         difficulty = "easy";
-        windowSizeY = findWindowSizeX();
-        windowSizeX = findWindowSizeY();
+        windowSizeX = findWindowSizeX();
+        windowSizeY = findWindowSizeY();
         primaryStage.setTitle("Minesweeper");
         // Initilize home scene and set as default scene
         primaryStage.setScene(createHomeScene());
@@ -63,7 +64,7 @@ public class MinesweeperApp extends Application {
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private void createMineField() {
-        game = new Minesweeper(fieldSizeX, fieldSizeY, difficulty);
+        game = new Minesweeper(numRows, numCols, difficulty);
         mineField = new GridPane();
         mineField.setHgap(1);
         mineField.setVgap(1);
@@ -88,8 +89,8 @@ public class MinesweeperApp extends Application {
             }
         };
         // Draw all tiles in the mine
-        for(int i = 0; i < this.fieldSizeX; i++) {
-            for(int j = 0; j < this.fieldSizeY; j++) {
+        for(int i = 0; i < this.numRows; i++) {
+            for(int j = 0; j < this.numCols; j++) {
                 mineField.add(game.getTile(i, j), j, i);
                 game.getTile(i, j).addEventFilter(MouseEvent.MOUSE_PRESSED, filter);
             }
@@ -101,7 +102,7 @@ public class MinesweeperApp extends Application {
     private Scene createHomeScene() {
         StackPane root = new StackPane();
         root.setAlignment(Pos.CENTER);
-        root.setPrefSize(windowSizeY, windowSizeX);
+        root.setPrefSize(windowSizeX, windowSizeY);
         VBox optionBox = new VBox();
         optionBox.setAlignment(Pos.CENTER);
         root.getChildren().add(optionBox);
@@ -111,9 +112,6 @@ public class MinesweeperApp extends Application {
         Button settingButton = new Button("Setting");
         // Give each button its functionality
         startButton.setOnAction(e -> {
-            System.out.println(window.getMinWidth());
-            System.out.println(window.getHeight());
-            window.setMinWidth(0);
             window.setScene(createGameScene());
         });
         settingButton.setOnAction(e -> {
@@ -133,32 +131,38 @@ public class MinesweeperApp extends Application {
         root.setPrefSize(windowSizeX, windowSizeY);
         BorderPane bp = new BorderPane();
         createMineField();
-        //bp.setTop(menuPane);
+        HBox menu = createGameSceneMenu();
+        bp.setTop(menu);
         bp.setCenter(mineField);
         root.getChildren().add(bp);
         ScrollPane sp = new ScrollPane();
+        sp.setStyle("-fx-background-color: rgba(142, 162, 159, 0.23)");
         sp.setContent(root);
-        sp.fitToWidthProperty();
+        //sp.fitToWidthProperty();
         return new Scene(sp);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create a menu pane for the game scene
     // This pane consists of few buttons of different functionality
-    /*private HBox createGameSceneMenu() {
+    private HBox createGameSceneMenu() {
         HBox menu = new HBox();
-        menu.setMinHeight(40);
-        menu.setStyle("-fx-background-color: rgb(173, 175, 174)");
+        menu.setSpacing(2);
+        // Load image for buttons
+        Image imgHome = new Image("home_button.png", 20 , 20, true, true);
+        Image imgSetting = new Image("setting_button.png", 20, 20, true, true);
+        Image imgClose = new Image("close_button.png", 20, 20, true, true);
+        Image imgNew = new Image("new_button.png", 20, 20, true, true);
         // Create buttons
-        Button homeButton = new Button("Home");
-        Button newButton = new Button("New Game");
-        Button settingButton = new Button("Setting");
-        Button closeButton = new Button("Close");
+        Button homeButton = new Button(null, new ImageView(imgHome));
+        Button newButton = new Button(null, new ImageView(imgNew));
+        Button settingButton = new Button(null, new ImageView(imgSetting));
+        Button closeButton = new Button(null, new ImageView(imgClose));
         // Assign button functionalities
         homeButton.setOnAction(e -> {
-            window.setScene(homeScene);
+            window.setScene(createHomeScene());
         });
         newButton.setOnAction(e -> {
-            gameScene = new Scene(createGameScene());
+            window.setScene(createGameScene());
         });
         settingButton.setOnAction(e ->{
             window.setScene(createSettingScene());
@@ -168,7 +172,7 @@ public class MinesweeperApp extends Application {
         });
         menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton);
         return menu;
-    }*/
+    }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private Scene createEndingScene(String message) {
         StackPane root = new StackPane();
@@ -196,7 +200,6 @@ public class MinesweeperApp extends Application {
         optionBox.getChildren().addAll(endingMsg, newButton, settingButton, exitButton);
         root.getChildren().addAll(mineField, optionBox);
         return new Scene(root);
-
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create setting scene that allows player to change game setting
@@ -209,25 +212,29 @@ public class MinesweeperApp extends Application {
         VBox optionBox = new VBox();
         optionBox.setAlignment(Pos.CENTER);
         // Choose game size
-        HBox fieldSizeBox= new HBox();
-        fieldSizeBox.setAlignment(Pos.CENTER);
-        Label fieldSizeLabel = new Label("Field Size");
-        Label xLabel = new Label("X");
-        ChoiceBox<Integer> fieldSizeXCB = new ChoiceBox<Integer>();
-        ChoiceBox<Integer> fieldSizeYCB = new ChoiceBox<Integer>();
-        for(int i = 5; i <= 40; i+=5) {
-            fieldSizeXCB.getItems().add(i);
-            fieldSizeYCB.getItems().add(i);
+        HBox numRowsBox= new HBox();
+        HBox numColsBox = new HBox();
+        numRowsBox.setAlignment(Pos.CENTER);
+        numColsBox.setAlignment(Pos.CENTER);
+        Label rowsLabel = new Label("Rows");
+        Label colsLabel = new Label("Cols");
+        ChoiceBox<Integer> numRowsCB = new ChoiceBox<Integer>();
+        ChoiceBox<Integer> numColsCB = new ChoiceBox<Integer>();
+        for(int i = 6; i <= 66; i+=6) {
+            numRowsCB.getItems().add(i);
+            numColsCB.getItems().add(i);
         }
-        fieldSizeXCB.setValue(this.fieldSizeX);
-        fieldSizeYCB.setValue(this.fieldSizeY);
+        numRowsCB.setValue(numRows);
+        numColsCB.setValue(numCols);
+        numRowsBox.getChildren().addAll(rowsLabel, numRowsCB);
+        numColsBox.getChildren().addAll(colsLabel, numColsCB);
         // Choose game diffculty
-        ChoiceBox<String> difficultyCB = new ChoiceBox<String>();
-        difficultyCB.getItems().addAll("easy", "medium", "hard");
-        difficultyCB.setValue("easy");
         HBox difficultyBox = new HBox();
         difficultyBox.setAlignment(Pos.CENTER);
         Label difficultyLabel = new Label("Difficulty");
+        ChoiceBox<String> difficultyCB = new ChoiceBox<String>();
+        difficultyCB.getItems().addAll("easy", "medium", "hard");
+        difficultyCB.setValue("easy");
         difficultyBox.getChildren().addAll(difficultyLabel, difficultyCB);
         // Buttons for saving and discarding changes
         HBox saveBox = new HBox();
@@ -235,8 +242,8 @@ public class MinesweeperApp extends Application {
         Button saveButton = new Button("Save");
         Button cancelButton = new Button("Cancel");
         saveButton.setOnAction(e -> {
-            fieldSizeX = fieldSizeXCB.getValue();
-            fieldSizeY= fieldSizeYCB.getValue();
+            numRows = numRowsCB.getValue();
+            numCols= numColsCB.getValue();
             difficulty = difficultyCB.getValue();
             windowSizeX = findWindowSizeX();
             windowSizeY = findWindowSizeY();
@@ -246,10 +253,8 @@ public class MinesweeperApp extends Application {
         cancelButton.setOnAction( e -> {
             this.window.setScene(createHomeScene());
         });
-
-        fieldSizeBox.getChildren().addAll(fieldSizeLabel, fieldSizeXCB, xLabel, fieldSizeYCB);
         saveBox.getChildren().addAll(saveButton, cancelButton);
-        optionBox.getChildren().addAll(fieldSizeBox, difficultyBox, saveBox);
+        optionBox.getChildren().addAll(numRowsBox, numColsBox, difficultyBox, saveBox);
         root.getChildren().add(optionBox);
         return new Scene(root);
     }
@@ -257,9 +262,9 @@ public class MinesweeperApp extends Application {
     // Return a proper value for the size of the window based on the size of
     // tiles and the size of mineField
     public int findWindowSizeX() {
-        return (tileSize+1) * fieldSizeX;
+        return (tileSize+1) * numCols;
     }
     public int findWindowSizeY() {
-        return (tileSize+1) * fieldSizeY;
+        return (tileSize+1) * numRows;
     }
 }
