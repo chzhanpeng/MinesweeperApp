@@ -91,7 +91,6 @@ public class MinesweeperApp extends Application {
                 if(game.win()) {
                     window.setScene(createEndingScene("You Win"));
                 }
-
             }
         };
         // Draw all tiles in the mine
@@ -150,7 +149,6 @@ public class MinesweeperApp extends Application {
         ScrollPane sp = new ScrollPane();
         sp.setStyle("-fx-background-color: rgba(142, 162, 159, 0.23)");
         sp.setContent(root);
-        //sp.fitToWidthProperty();
         return new Scene(sp);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -158,17 +156,20 @@ public class MinesweeperApp extends Application {
     // This pane consists of few buttons of different functionality
     private HBox createGameSceneMenu() {
         HBox menu = new HBox();
-        menu.setSpacing(2);
-        // Load image for buttons
-        Image imgHome = new Image("home_button.png", 20 , 20, true, true);
-        Image imgSetting = new Image("setting_button.png", 20, 20, true, true);
-        Image imgClose = new Image("close_button.png", 20, 20, true, true);
-        Image imgNew = new Image("new_button.png", 20, 20, true, true);
+        // Load images for buttons
+        Image imgHome = new Image("home_button.png", 15, 15, false, false);
+        Image imgSetting = new Image("setting_button.png", 15, 15, false, false);
+        Image imgClose = new Image("close_button.png", 15, 15, false, false);
+        Image imgNew = new Image("new_button.png", 15, 15, false, false);
         // Create buttons
         Button homeButton = new Button(null, new ImageView(imgHome));
         Button newButton = new Button(null, new ImageView(imgNew));
         Button settingButton = new Button(null, new ImageView(imgSetting));
         Button closeButton = new Button(null, new ImageView(imgClose));
+        homeButton.setPrefSize(20, 20);
+        newButton.setPrefSize(20, 20);
+        settingButton.setPrefSize(20, 20);
+        closeButton.setPrefSize(20, 20);
         // Assign button functionalities
         homeButton.setOnAction(e -> {
             window.setScene(createHomeScene());
@@ -197,6 +198,11 @@ public class MinesweeperApp extends Application {
         Button newButton = new Button("New Game");
         Button settingButton = new Button("Setting");
         Button exitButton = new Button("Exit");
+        // Resize buttons
+        newButton.setPrefWidth(75);
+        settingButton.setPrefWidth(75);
+        exitButton.setPrefWidth(75);
+        // Add event handler for buttons
         newButton.setOnAction(e -> {
             mineField = null;
             createMineField();
@@ -282,6 +288,6 @@ public class MinesweeperApp extends Application {
         return (tileSize+1) * numCols;
     }
     public int findWindowSizeY() {
-        return (tileSize+1) * numRows;
+        return (tileSize+1) * numRows + 22;
     }
 }
