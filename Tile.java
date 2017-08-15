@@ -51,10 +51,10 @@ public class Tile extends StackPane {
 
 	// Reveal this tile
 	public void reveal() {
+		visible = true;
 		txt.setText(getText());
 		rect.setFill(getColor());
 		txt.setVisible(true);
-		visible = true;
 	}
 
 	// Return appropriate color for this tile
@@ -90,6 +90,7 @@ public class Tile extends StackPane {
 	// Remove flag
 	public void deflag() {
 		flag = false;
+		rect.setFill(Color.GRAY);
 	}
 	// Return true if this tile is flagged
 	public boolean isFlagged() {

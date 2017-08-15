@@ -131,8 +131,8 @@ public class Minesweeper {
         numFlags++;
     }
 
-    // Unflag a tile and decrement numFlags
-    public void unflag(int r, int c)
+    // deflag a tile and decrement numFlags
+    public void deflag(int r, int c)
     {
         this.board[r][c].deflag();
         this.numFlags--;
@@ -264,7 +264,7 @@ public class Minesweeper {
         this.numRevealed = 0;
     }
 
-    // Unflag all tiles
+    // deflag all tiles
     protected void deflagAll()
     {
         for(int r = 0; r < this.height(); r++)

@@ -75,17 +75,23 @@ public class MinesweeperApp extends Application {
                 Node source = (Node) e.getSource();
                 Integer row = GridPane.getRowIndex(source);
                 Integer col = GridPane.getColumnIndex(source);
-                if(e.getButton() == MouseButton.PRIMARY) {
+                if(e.getButton() == MouseButton.PRIMARY &&
+                    !game.isFlagged(row, col)) {
                     game.reveal(row, col);
+                    if(game.getTile(row, col).isMine()) {
+                        window.setScene(createEndingScene("You Lose"));
+                    }
                 } else if(e.getButton() == MouseButton.SECONDARY) {
-                    game.flag(row, col);
+                    if(game.isFlagged(row, col)) {
+                        game.deflag(row, col);
+                    } else if(!game.isVisible(row, col)){
+                        game.flag(row, col);
+                    }
                 }
                 if(game.win()) {
                     window.setScene(createEndingScene("You Win"));
                 }
-                if(game.getTile(row, col).isMine()) {
-                    window.setScene(createEndingScene("You Lose"));
-                }
+
             }
         };
         // Draw all tiles in the mine
@@ -110,6 +116,8 @@ public class MinesweeperApp extends Application {
         Button startButton = new Button("Start");
         Button closeButton = new Button("Close");
         Button settingButton = new Button("Setting");
+
+        //System.out.println(settingButton.getWidth());
         // Give each button its functionality
         startButton.setOnAction(e -> {
             window.setScene(createGameScene());
@@ -121,6 +129,10 @@ public class MinesweeperApp extends Application {
             window.close();
         });
         optionBox.getChildren().addAll(startButton, settingButton, closeButton);
+        // Resize buttons
+        startButton.setPrefWidth(55);
+        closeButton.setPrefWidth(55);
+        settingButton.setPrefWidth(55);
         return new Scene(root);
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -248,11 +260,16 @@ public class MinesweeperApp extends Application {
             windowSizeX = findWindowSizeX();
             windowSizeY = findWindowSizeY();
             window.setScene(createHomeScene());
-            //createGameScene();
         });
         cancelButton.setOnAction( e -> {
             this.window.setScene(createHomeScene());
         });
+        // Reside choice boxes and buttons
+        numRowsCB.setPrefWidth(60);
+        numColsCB.setPrefWidth(60);
+        difficultyCB.setPrefWidth(60);
+        saveButton.setPrefWidth(60);
+        cancelButton.setPrefWidth(60);
         saveBox.getChildren().addAll(saveButton, cancelButton);
         optionBox.getChildren().addAll(numRowsBox, numColsBox, difficultyBox, saveBox);
         root.getChildren().add(optionBox);
