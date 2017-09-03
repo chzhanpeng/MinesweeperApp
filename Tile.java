@@ -51,7 +51,8 @@ public class Tile extends StackPane {
 		this.getChildren().addAll(rect, txt);
 	}
 
-	// Reveal this tile
+	// Reveal this tile, display numSurroundingMines if it's a safe tile,
+	// display bomb image if is a mine
 	public void reveal() {
 		visible = true;
 		txt.setText(getText());

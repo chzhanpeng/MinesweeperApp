@@ -45,15 +45,15 @@ public class MinesweeperApp extends Application {
     // Game difficulty
     private String difficulty;
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Application starts runnning here
     @Override
     public void start(Stage primaryStage) throws Exception {
         window = primaryStage;
         // Initialize default values;
         tileSize = 20;
-        numRows = 24;
-        numCols = 24;
+        numRows = 12;
+        numCols = 12;
         difficulty = "easy";
         windowSizeX = findWindowSizeX();
         windowSizeY = findWindowSizeY();
@@ -62,7 +62,7 @@ public class MinesweeperApp extends Application {
         primaryStage.setScene(createHomeScene());
         primaryStage.show();
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create mineFiled and store in mineField
     // This method creates all the tiles and event handler for each tile
     private void createMineField() {
@@ -80,7 +80,7 @@ public class MinesweeperApp extends Application {
             }
         }
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create event filter that only allow tiles to detect mouse event
     // This event handler tracks the source of the click and make action to
     // the game.
@@ -114,7 +114,7 @@ public class MinesweeperApp extends Application {
         };
         return filter;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the home scene
     // MenuScene contains start, setting, and close buttons
     private Scene createHomeScene() {
@@ -150,7 +150,7 @@ public class MinesweeperApp extends Application {
         optionBox.getChildren().addAll(startButton, settingButton, closeButton);
         return new Scene(root);
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // This method creates the main game scene
     // This scene includes the gameSceneMenu and the mineField
     private Scene createGameScene() {
@@ -171,7 +171,7 @@ public class MinesweeperApp extends Application {
         sp.setContent(root);
         return new Scene(sp);
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create a menu pane for the game scene
     // This pane consists of few buttons of different functionality
     private HBox createGameSceneMenu() {
@@ -232,7 +232,7 @@ public class MinesweeperApp extends Application {
         menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton, hintButton);
         return menu;
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return the ending scene
     // This scene uses the game scene as background and 3 buttons
     private Scene createEndingScene(String message) {
@@ -270,7 +270,7 @@ public class MinesweeperApp extends Application {
         root.getChildren().addAll(mineField, optionBox);
         return new Scene(root);
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Create setting scene that allows player to change game setting
     // This scene includes some dropdown menus that allow player to select
     // size of mine field and game difficulty; it also contains 2 buttons for
@@ -338,7 +338,7 @@ public class MinesweeperApp extends Application {
         root.getChildren().add(optionBox);
         return new Scene(root);
     }
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return a proper value for the size of the window based on the size of
     // tiles and the size of mineField
     public int findWindowSizeX() {
