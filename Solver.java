@@ -5,15 +5,18 @@ public class Solver {
         //int[] arr = new int[2];
         for(int r = 0; r < game.height(); r++) {
             for(int c = 0; c < game.width(); c++) {
-                if(game.isVisible(r,c)){
+                if(game.isVisible(r,c) && game.needCheck(r, c)){
                     if(Solver.foundAllAdjacentSafeTiles(game, r, c)) {
-                        //System.out.printf("%d %d\n", r, c);
+                        game.skip(r, c);
+                        System.out.printf("%d %d\n", r, c);
                         Solver.flagAdjacentMines(game, r , c);
-                        //return;
+                        return;
                     }
                     if(Solver.foundAllAdjacentMines(game, r, c)) {
-                        //System.out.printf("%d %d\n", r, c);
-                        Solver.findAdjacentSafeTile(game, r, c);
+                        game.skip(r, c);
+                        System.out.printf("%d %d\n", r, c);
+                        Solver.revealAdjacentSafeTile(game, r, c);
+                        return;
                     }
                 }
             }
@@ -21,7 +24,7 @@ public class Solver {
     }
 
     //
-    private static void findAdjacentSafeTile(Minesweeper game, int r, int c) {
+    private static void revealAdjacentSafeTile(Minesweeper game, int r, int c) {
         if(r != 0 && c != 0) {
             if(!game.isFlagged(r-1, c-1)) {
                 if(!game.isVisible(r-1, c-1)) {
@@ -133,6 +136,9 @@ public class Solver {
         return false;
     }
 
+
+
+
     // Check if all adjacent safe tiles of a tile are visible
     private static boolean foundAllAdjacentSafeTiles(Minesweeper game, int r, int c) {
         int count = 0;
@@ -186,7 +192,6 @@ public class Solver {
         }
         return false;
     }
-
     private static void flagAdjacentMines(Minesweeper game, int r, int c) {
         if(r != 0 && c != 0) {
             if(game.isVisible(r-1, c-1) == false)

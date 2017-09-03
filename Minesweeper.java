@@ -138,6 +138,16 @@ public class Minesweeper {
         this.numFlags--;
     }
 
+    // Return true if check is needed for a tile
+    public boolean needCheck(int r, int c) {
+        return getTile(r,c).needCheck();
+    }
+
+    // Skip tile on future check
+    public void skip(int r, int c) {
+        getTile(r, c).skip();
+    }
+
     // Return difficulty of the game
     public String gameDifficulty()
     {

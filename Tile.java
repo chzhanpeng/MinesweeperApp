@@ -8,6 +8,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.image.Image;
 
 
 // Tiles to place on game board
@@ -53,13 +55,13 @@ public class Tile extends StackPane {
 	public void reveal() {
 		visible = true;
 		txt.setText(getText());
-		rect.setFill(getColor());
 		txt.setVisible(true);
-	}
-
-	// Return appropriate color for this tile
-	private Color getColor() {
-		return this.mine == true ? Color.RED : Color.WHITE;
+		if(isMine()) {
+			Image img = new Image("bomb.png");
+			rect.setFill(new ImagePattern(img));
+		} else {
+			rect.setFill(Color.WHITE);
+		}
 	}
 
 	// Return number of surrounding mine as Text
@@ -70,30 +72,47 @@ public class Tile extends StackPane {
 			return numSurroundingMines == 0 ? "" : String.format("%d", numSurroundingMines);
 		}
 	}
+
 	// Return true if this tile is a mine
 	public boolean isMine() {
 		return mine;
 	}
+
 	// Return number of surrounding mines
 	public int getNumSurroundingMines() {
 		return numSurroundingMines;
 	}
+
 	// Return true if this tile is revealable
 	public boolean isRevealable() {
 		return !visible;
 	}
+
 	// Flag this tile
 	public void flag() {
 		flag = true;
-		rect.setFill(Color.GREEN);
+		Image img = new Image("flag.png");
+		rect.setFill(new ImagePattern(img));
 	}
+
 	// Remove flag
 	public void deflag() {
 		flag = false;
 		rect.setFill(Color.GRAY);
 	}
+
 	// Return true if this tile is flagged
 	public boolean isFlagged() {
 		return flag;
+	}
+
+	// Return true is check is needed for this tile
+	public boolean needCheck() {
+		return check;
+	}
+
+	// Skip this tile on next check
+	public void skip() {
+		check = false;
 	}
 }
