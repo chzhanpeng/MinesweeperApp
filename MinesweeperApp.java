@@ -94,12 +94,12 @@ public class MinesweeperApp extends Application {
 
                 // Handle left click
                 if(e.getButton() == MouseButton.PRIMARY &&
-                    !game.isFlagged(row, col)) {
+                !game.isFlagged(row, col)) {
                     game.reveal(row, col);
                     if(game.getTile(row, col).isMine()) {
                         window.setScene(createEndingScene("You Lose"));
                     }
-                // Handle right click
+                    // Handle right click
                 } else if(e.getButton() == MouseButton.SECONDARY) {
                     if(game.isFlagged(row, col)) {
                         game.deflag(row, col);
@@ -183,12 +183,14 @@ public class MinesweeperApp extends Application {
         Image imgSetting = new Image("setting_button.png", 18, 18, false, false);
         Image imgClose = new Image("close_button.png", 18, 18, false, false);
         Image imgNew = new Image("new_button.png", 18, 18, false, false);
+        Image imgHint = new Image("hint_button.png", 18, 18, false, false);
 
         // Create buttons
         Button homeButton = new Button(null, new ImageView(imgHome));
         Button newButton = new Button(null, new ImageView(imgNew));
         Button settingButton = new Button(null, new ImageView(imgSetting));
         Button closeButton = new Button(null, new ImageView(imgClose));
+        Button hintButton = new Button(null, new ImageView(imgHint));
 
         // Resize the buttons
         homeButton.setMinWidth(20);
@@ -199,10 +201,14 @@ public class MinesweeperApp extends Application {
         settingButton.setMinHeight(20);
         closeButton.setMinWidth(20);
         closeButton.setMinHeight(20);
+        hintButton.setMinWidth(20);
+        hintButton.setMinHeight(20);
+
         homeButton.setPrefSize(20, 20);
         newButton.setPrefSize(20, 20);
         settingButton.setPrefSize(20, 20);
         closeButton.setPrefSize(20, 20);
+        hintButton.setPrefSize(20, 20);
 
         // Assign button functionalities
         homeButton.setOnAction(e -> {
@@ -217,9 +223,13 @@ public class MinesweeperApp extends Application {
         closeButton.setOnAction(e -> {
             window.close();
         });
+        hintButton.setOnAction(e -> {
+            Solver.search(game);
+            //System.out.printf("%d %d\n", coord[0], coord[1]);
+        });
 
         // Gather all components and return menu box
-        menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton);
+        menu.getChildren().addAll(homeButton, newButton, settingButton, closeButton, hintButton);
         return menu;
     }
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
