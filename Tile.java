@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 
 // Tiles to place on game board
 public class Tile extends StackPane {
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Whether the tile is a mine
 	protected boolean mine;
 	// Number of surrounding mines in surrounding tile
@@ -31,7 +31,7 @@ public class Tile extends StackPane {
 	protected Rectangle rect;
 	// Text for  number of surrouding mine
 	protected Text txt;
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Tile class constructor, initialize mine field,
 	public Tile(int row, int col, boolean mine) {
 		this.row = row;
@@ -50,7 +50,7 @@ public class Tile extends StackPane {
 		this.txt.setVisible(false);
 		this.getChildren().addAll(rect, txt);
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Reveal this tile, display numSurroundingMines if it's a safe tile,
 	// display bomb image if is a mine
 	public void reveal() {
@@ -64,7 +64,7 @@ public class Tile extends StackPane {
 			rect.setFill(Color.WHITE);
 		}
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return number of surrounding mine as Text
 	private String getText() {
 		if(this.mine == true) {
@@ -73,47 +73,48 @@ public class Tile extends StackPane {
 			return numSurroundingMines == 0 ? "" : String.format("%d", numSurroundingMines);
 		}
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return true if this tile is a mine
 	public boolean isMine() {
 		return mine;
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return number of surrounding mines
 	public int getNumSurroundingMines() {
 		return numSurroundingMines;
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return true if this tile is revealable
 	public boolean isRevealable() {
 		return !visible;
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Flag this tile
 	public void flag() {
 		flag = true;
 		Image img = new Image("flag.png");
 		rect.setFill(new ImagePattern(img));
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Remove flag
 	public void deflag() {
 		flag = false;
 		rect.setFill(Color.GRAY);
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return true if this tile is flagged
 	public boolean isFlagged() {
 		return flag;
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Return true is check is needed for this tile
 	public boolean needCheck() {
 		return check;
 	}
-
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Skip this tile on next check
 	public void skip() {
 		check = false;
 	}
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }

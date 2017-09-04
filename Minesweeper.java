@@ -1,7 +1,7 @@
 import java.lang.StringBuilder;
 
 public class Minesweeper {
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Game board consists a matrix of tile object as mines,
     protected Tile[][] board;
     // Difficulty of the game
@@ -16,7 +16,7 @@ public class Minesweeper {
     protected int fmRow, fmCol;
     // Whether it's brand new game/ no move taken
     protected boolean fresh;
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Constructor, initialize fields and generate mines
     public Minesweeper(int width, int height, String difficulty) {
         this.board = new Tile[width][height];
@@ -35,7 +35,7 @@ public class Minesweeper {
         }
         this.initBoard();
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Initialize board, create tiles for each position on board
     public void initBoard() {
         for(int r = 0; r < this.height(); r++) {
@@ -44,12 +44,12 @@ public class Minesweeper {
             }
         }
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return tile at position i,j
     public Tile getTile(int i, int j) {
         return this.board[i][j];
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Check if player wins
     // Player wins by flagging all mines or reveal all safe tiles
     public boolean win() {
@@ -58,42 +58,42 @@ public class Minesweeper {
         this.height()*this.width() - this.numRevealed == this.numMines ||
         this.numFlags + this.numRevealed == this.height()*this.width();
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return first move row index
     public int getFMRow() {
         return fmRow;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return first move column index
     public int getFMCol() {
         return fmCol;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return number of mines in the field
     public int getNumMines() {
         return numMines;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Check if all mines are flagged
     public boolean allFlagged() {
         return numMines == numFlags ? true : false;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Check if a tile is visible
     public boolean isVisible(int row, int col) {
         return this.board[row][col].visible;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Check if a tile has a flag
     public boolean isFlagged(int row, int col) {
         return this.board[row][col].isFlagged();
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return number of surrounding mines
     public int numSurroundingMines(int row, int col) {
         return this.board[row][col].numSurroundingMines;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return number of surrounding tiles, border tiles have less
     // surrounding tiles
     public int numSurroundingTiles(int row, int col) {
@@ -109,44 +109,44 @@ public class Minesweeper {
         }
         return num;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return game width
     public int width() {
         return this.board[0].length;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return game height
     public int height() {
         return this.board.length;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Flag a tile and increment numFlags
     public void flag(int r, int c) {
         board[r][c].flag();
         numFlags++;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // deflag a tile and decrement numFlags
     public void deflag(int r, int c) {
         this.board[r][c].deflag();
         this.numFlags--;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return true if check is needed for a tile
     public boolean needCheck(int r, int c) {
         return getTile(r,c).needCheck();
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Skip tile on future check
     public void skip(int r, int c) {
         getTile(r, c).skip();
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Return difficulty of the game
     public String gameDifficulty() {
         return difficulty;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Reveal a tile that player choose, check if the move is first move,
     // generate game after first move; check if the tile is a mine, game is
     // over if so, reveal its neighbors if a tile is blank tile
@@ -164,13 +164,14 @@ public class Minesweeper {
             } else {
                 board[r][c].reveal();
                 if(board[r][c].getNumSurroundingMines() == 0) {
+                    skip(r, c);
                     revealNeighbor(r,c);
                 }
                 numRevealed++;
             }
         }
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Reveal safe neighboring tiles, Recursively revealNeighbor for the
     // adjacent safe tiles, stop until adjcent tile that has more than 0
     // numSurroundingMines
@@ -216,7 +217,7 @@ public class Minesweeper {
             }
         }
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Reveal all tiles and print game
     protected void revealAll() {
         for(int r = 0; r < this.height(); r++) {
@@ -225,7 +226,7 @@ public class Minesweeper {
             }
         }
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Cover all tiles
     protected void coverAll() {
         for(int r = 0; r < this.height(); r++) {
@@ -235,7 +236,7 @@ public class Minesweeper {
         }
         this.numRevealed = 0;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // deflag all tiles
     protected void deflagAll() {
         for(int r = 0; r < this.height(); r++) {
@@ -245,7 +246,7 @@ public class Minesweeper {
         }
         this.numFlags = 0;
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // A cheat for testing purpose ONLY, draw board with all mines marked
     //    0 1 2 3
     //-------------
@@ -278,7 +279,7 @@ public class Minesweeper {
         repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
         System.out.println(repr.toString());
     }
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // String representation of game board for player
     // '?' for a unrevealed tile
     // '*' for a revealed tile with mine
@@ -320,4 +321,5 @@ public class Minesweeper {
         repr.append(new String(new char[this.width()*2 +5]).replace("\0","-"));
         return repr.toString();
     }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }

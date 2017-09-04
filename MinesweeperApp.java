@@ -29,7 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class MinesweeperApp extends Application {
-
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // The window of the application
     private Stage window;
     // Size of window
@@ -44,7 +44,6 @@ public class MinesweeperApp extends Application {
     private Minesweeper game;
     // Game difficulty
     private String difficulty;
-
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Application starts runnning here
     @Override
@@ -225,7 +224,9 @@ public class MinesweeperApp extends Application {
         });
         hintButton.setOnAction(e -> {
             Solver.search(game);
-            //System.out.printf("%d %d\n", coord[0], coord[1]);
+            if(game.win()) {
+                window.setScene(createEndingScene("You Win"));
+            }
         });
 
         // Gather all components and return menu box
