@@ -58,7 +58,7 @@ public class Tile extends StackPane {
 		txt.setText(getText());
 		txt.setVisible(true);
 		if(isMine()) {
-			Image img = new Image("bomb.png");
+			Image img = new Image(getClass().getResourceAsStream("images/bomb.png"), 18, 18, false, false);
 			rect.setFill(new ImagePattern(img));
 		} else {
 			rect.setFill(Color.WHITE);
@@ -92,7 +92,7 @@ public class Tile extends StackPane {
 	// Flag this tile
 	public void flag() {
 		flag = true;
-		Image img = new Image("flag.png");
+		Image img = new Image(getClass().getResourceAsStream("images/flag.png"), 18, 18, false, false);
 		rect.setFill(new ImagePattern(img));
 	}
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -178,11 +178,11 @@ public class MinesweeperApp extends Application {
         menu.setSpacing(1);
 
         // Load images for buttons
-        Image imgHome = new Image("file:../source/images/home_button.png", 18, 18, false, false);
-        Image imgSetting = new Image("file:../source/images/setting_button.png", 18, 18, false, false);
-        Image imgClose = new Image("file:../source/images/close_button.png", 18, 18, false, false);
-        Image imgNew = new Image("file:../source/images/new_button.png", 18, 18, false, false);
-        Image imgHint = new Image("file:../source/images/hint_button.png", 18, 18, false, false);
+        Image imgHome = new Image(getClass().getResourceAsStream("images/home_button.png"), 18, 18, false, false);
+        Image imgSetting = new Image(getClass().getResourceAsStream("images/setting_button.png"), 18, 18, false, false);
+        Image imgClose = new Image(getClass().getResourceAsStream("images/close_button.png"), 18, 18, false, false);
+        Image imgNew = new Image(getClass().getResourceAsStream("images/new_button.png"), 18, 18, false, false);
+        Image imgHint = new Image(getClass().getResourceAsStream("images/hint_button.png"), 18, 18, false, false);
 
         // Create buttons
         Button homeButton = new Button(null, new ImageView(imgHome));
